@@ -6,6 +6,7 @@ cfg.backbone = 'resnet50'
 cfg.frezeBN = False
 cfg.frezeLayer = False
 cfg.align_corners = False   ## ref torch.nn.functional.interpolate /// when align_corners==False : [Follow Opencv resize logic]
+cfg.resume = True  ## resume an experiment.Reloaded the optimizer parameter . make sure cfg.weights!="".
 cfg.weights = ''
 cfg.device = 'cuda'
 
