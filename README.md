@@ -1,5 +1,5 @@
 # TensorMask
-## The code is unofficial version for [TensorMask: A Foundation for Dense Object Segmentation](https://arxiv.org/abs/1903.12174).
+### The code is unofficial version for [TensorMask: A Foundation for Dense Object Segmentation](https://arxiv.org/abs/1903.12174).
 
 * ![image](img/test.png)
 
