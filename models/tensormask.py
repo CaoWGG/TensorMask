@@ -52,6 +52,7 @@ class TensorMask(nn.Module):
         self.base_window = base_window
 
 
+        nn.init.constant_(self.box_subnet.fc.bias, 1)   ###  training box start with a little box not a point(its hard).
         nn.init.kaiming_uniform_(self.mask_fuse[0].weight, a=1)
         nn.init.constant_(self.mask_fuse[0].bias, 0)
         nn.init.kaiming_uniform_(self.mask_head.weight, a=1)
