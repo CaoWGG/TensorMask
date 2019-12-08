@@ -36,13 +36,15 @@ for batch in val_loader:
     input = batch['input'].cuda()
     output= model(input)
 
-    socres = output['cls'].sigmoid_().detach().cpu().numpy()
+    socres, cls = torch.max(output['cls'].sigmoid_(), dim=-1)
+    socres = socres.detach().cpu().numpy()
+    cls = cls.detach().cpu().numpy()
     box= output['box'].detach().cpu().numpy()
     seg = [output['%d'%i].sigmoid_().detach().cpu().numpy() for i in range(opt.k+1)]
     topk_inds = np.where(socres > 0.4)
 
     for det_num in topk_inds[1]:
-        p = socres[0,det_num,0]
+        p = socres[0,det_num]
         b = box[0,det_num,:]
         for id,num in enumerate(det_offset):
             if num > det_num:
