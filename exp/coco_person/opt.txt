@@ -1,0 +1,45 @@
+==> torch version: 1.0.0
+==> cudnn version: 7401
+==> Cmd:
+['train.py']
+==> Opt:
+  align_corners: False
+  backbone: resnet50
+  base_stride: 4
+  base_window: 12
+  batch_size: 18
+  class_name: person
+  clear: <built-in method clear of EasyDict object at 0x7fcad8363950>
+  cls_weights: 1.0
+  copy: <built-in method copy of EasyDict object at 0x7fcad8363950>
+  data_dir: /data/yoloCao/DataSet/coco
+  device: cuda
+  exp_id: coco_person
+  frezeBN: False
+  frezeLayer: False
+  fromkeys: <built-in method fromkeys of type object at 0x56214e124ca0>
+  get: <built-in method get of EasyDict object at 0x7fcad8363950>
+  gpus: [0, 1, 2]
+  gpus_str: 0,1,2
+  input_h: 512
+  input_w: 640
+  items: <built-in method items of EasyDict object at 0x7fcad8363950>
+  jitter: 0.3
+  k: 5
+  keys: <built-in method keys of EasyDict object at 0x7fcad8363950>
+  lr: 0.02
+  lr_step: [64, 70]
+  mask_weights: 2.0
+  num_class: 1
+  num_epochs: 72
+  pop: <bound method EasyDict.pop of {'backbone': 'resnet50', 'frezeBN': False, 'frezeLayer': False, 'align_corners': False, 'weights': '', 'device': 'cuda', 'cls_weights': 1.0, 'xywh_weights': 0.25, 'mask_weights': 2.0, 'data_dir': '/data/yoloCao/DataSet/coco', 'num_class': 1, 'class_name': 'person', 'input_h': 512, 'input_w': 640, 'base_window': 12, 'base_stride': 4, 'k': 5, 'jitter': 0.3, 'lr': 0.02, 'num_epochs': 72, 'lr_step': [64, 70], 'warm_up': 1000, 'batch_size': 18, 'gpus_str': '0,1,2', 'save_dir': 'exp/coco_person', 'exp_id': 'coco_person', 'print_iter': 1, 'test': False, 'gpus': [0, 1, 2]}>
+  popitem: <built-in method popitem of EasyDict object at 0x7fcad8363950>
+  print_iter: 1
+  save_dir: exp/coco_person
+  setdefault: <built-in method setdefault of EasyDict object at 0x7fcad8363950>
+  test: False
+  update: <bound method EasyDict.update of {'backbone': 'resnet50', 'frezeBN': False, 'frezeLayer': False, 'align_corners': False, 'weights': '', 'device': 'cuda', 'cls_weights': 1.0, 'xywh_weights': 0.25, 'mask_weights': 2.0, 'data_dir': '/data/yoloCao/DataSet/coco', 'num_class': 1, 'class_name': 'person', 'input_h': 512, 'input_w': 640, 'base_window': 12, 'base_stride': 4, 'k': 5, 'jitter': 0.3, 'lr': 0.02, 'num_epochs': 72, 'lr_step': [64, 70], 'warm_up': 1000, 'batch_size': 18, 'gpus_str': '0,1,2', 'save_dir': 'exp/coco_person', 'exp_id': 'coco_person', 'print_iter': 1, 'test': False, 'gpus': [0, 1, 2]}>
+  values: <built-in method values of EasyDict object at 0x7fcad8363950>
+  warm_up: 1000
+  weights: 
+  xywh_weights: 0.25
