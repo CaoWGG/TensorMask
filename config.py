@@ -11,7 +11,7 @@ cfg.weights = ''
 cfg.device = 'cuda'
 
 cfg.cls_weights = 1.
-cfg.xywh_weights = 1/4.
+cfg.xywh_weights = 1.
 cfg.mask_weights = 2.   ## from paper
 
 cfg.data_dir = '/data/yoloCao/DataSet/coco'
