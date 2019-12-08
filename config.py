@@ -22,6 +22,7 @@ cfg.input_w = 640   ## 640 % 128 = 0
 cfg.base_window = 12   ## base_window%2==0 in this impl..|| max window = 12* base_stride * 2^5 / 2  =  768  > 640
 cfg.base_stride = 4    ## feat_2 --> strideHW=4
 cfg.k = 5 # 0 1 2 3 4 5
+cfg.max_objs = 45  ## one image objs
 cfg.jitter = 0.3
 
 

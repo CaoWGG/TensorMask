@@ -67,7 +67,7 @@ class COCO(Dataset):
         self.num_class = len(self.class_name)
 
         self.augment=augment
-        self.max_objs = 45
+        self.max_objs = cfg.max_objs
         self.jitter = cfg.jitter
         self.cfg = cfg
         if not self.augment:

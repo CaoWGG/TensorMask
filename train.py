@@ -38,14 +38,14 @@ val_loader = torch.utils.data.DataLoader(
     batch_size=8,
     shuffle=False,
     num_workers=8,
-    pin_memory=True
+    pin_memory=False
 )
 train_loader = torch.utils.data.DataLoader(
     COCO(cfg=opt, split='train',augment=True),
     batch_size=opt.batch_size,
     shuffle=True,
     num_workers=8,
-    pin_memory=True
+    pin_memory=False
 )
 
 print('Starting training...')
