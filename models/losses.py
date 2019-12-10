@@ -71,7 +71,7 @@ class BOXLoss(nn.Module):
 class MaskBCELoss(nn.Module):
     def __init__(self):
         super(MaskBCELoss, self).__init__()
-
+        self.register_buffer('pos_weight',torch.tensor(1.5,dtype=torch.float32))
 
     def forward(self, output, mask, ind, target):
         B,N,window=target.size(0),target.size(1),target.size(-1)
@@ -79,9 +79,7 @@ class MaskBCELoss(nn.Module):
         pred = _tranpose_and_gather_feat(output, ind).view(B,N,window,window)
         mask = mask.unsqueeze(2).unsqueeze(2).expand_as(pred).float()
         bce_loss =F.binary_cross_entropy_with_logits(pred,target,
-                                                     pos_weight=torch.tensor(1.5,
-                                                                             dtype=torch.float32,
-                                                                             device=pred.device),
+                                                     pos_weight=self.pos_weight,
                                                      reduction='none')
         num_smaple = mask.sum()
         loss = (bce_loss*mask).sum()
