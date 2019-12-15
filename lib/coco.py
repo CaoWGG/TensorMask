@@ -1,4 +1,5 @@
 import pycocotools.coco as coco
+import pycocotools.cocoeval
 import numpy as np
 import os
 import cv2
@@ -58,6 +59,7 @@ class COCO(Dataset):
             assert catIds == self._valid_ids
             self.images = self.coco.getImgIds(self.images, catIds)
             self.num_samples = len(self.images)
+
         self.cat_ids = {v: i for i, v in enumerate(self._valid_ids)}
         self.input_w = cfg.input_w
         self.input_h = cfg.input_h
@@ -89,7 +91,6 @@ class COCO(Dataset):
         return float("{:.2f}".format(x))
 
     def __getitem__(self, index):
-
         img_id = self.images[index]
         file_name = self.coco.loadImgs(ids=[img_id])[0]['file_name']
         img_path = os.path.join(self.img_dir, file_name)
@@ -124,8 +125,6 @@ class COCO(Dataset):
         image = cv2.warpAffine(image, trans_input, (self.input_w, self.input_h),
                                flags=cv2.INTER_LINEAR, borderValue=(0, 0, 0))
         show = image.copy()
-
-
         image = (image.astype(np.float32) / 255.)
         image = (image- self.mean) / self.std
         image = image.transpose(2, 0, 1)
@@ -161,52 +160,62 @@ class COCO(Dataset):
             bbox[[0, 2]] = np.clip(bbox[[0, 2]], 0, self.input_w - 1)
             bbox[[1, 3]] = np.clip(bbox[[1, 3]], 0, self.input_h - 1)
 
-            w , h = bbox[2:] - bbox[:2]
-            max_edge = max(w,h)
-            min_edge = min(w,h)
+            w, h = bbox[2:] - bbox[:2]
+            max_edge = max(w, h)
+            min_edge = min(w, h)
             ratio = max_edge / windows
-            window_mask=(ratio > 0.5) * (ratio < 1.)  ## window > max(w,h) > window/2
+            window_mask = (ratio >= 0.5) * (ratio <= 1.)  ## window > max(w,h) > window/2
             best_window = windows[window_mask]
-            if len(best_window)==1 and min_edge > 0 :  ## min_edge must > 0
-                segment= cv2.warpAffine(segment, trans_input,
-                                     (self.input_w, self.input_h),
-                                     flags=cv2.INTER_LINEAR)
+            if len(best_window) == 0 and \
+                    min_edge > 0 and \
+                    min_edge < windows[0]:  ### for small guys
+                best_window = [windows[0]]
+                window_mask[0] = True
 
-                stride = strides[window_mask][0]
-                best_window = best_window[0]
-                feat_w, feat_h = output_size[window_mask][0]
+            feat_stride = strides[window_mask]
+            feat_size = output_size[window_mask]
+            window_offset = det_offset[window_mask]
+            if len(best_window) > 0 and min_edge > 0:  ## min_edge must > 0
+                segment = cv2.warpAffine(segment, trans_input,
+                                         (self.input_w, self.input_h),
+                                         flags=cv2.INTER_LINEAR)
                 ct = np.array(
                     [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
 
-                xx , yy = np.arange(0,feat_w),np.arange(0,feat_h)
-                xx , yy = (xx + 0.5) *stride,(yy + 0.5) * stride
-                ct_feat_x,ct_feat_y = np.argmin(np.abs(ct[0] - xx)),np.argmin(np.abs(ct[1] - yy))  ## window ct close to box ct
-                ct_x , ct_y  = int(xx[ct_feat_x]),int(yy[ct_feat_y])
+                for window_id in range(len(best_window)):
+                    best_window_size = best_window[window_id]
+                    feat_w, feat_h = feat_size[window_id]
+                    stride = feat_stride[window_id]
 
-                paded_segmnet = np.pad(segment, ((best_window//2, best_window//2), (best_window//2, best_window//2)), 'constant',
-                                       constant_values=0)
-                window_segment = paded_segmnet[ct_y : ct_y + best_window,ct_x : ct_x + best_window]
+                    xx, yy = np.arange(0, feat_w), np.arange(0, feat_h)
+                    xx, yy = (xx + 0.5) * stride, (yy + 0.5) * stride
+                    ct_feat_x, ct_feat_y = np.argmin(np.abs(ct[0] - xx)), np.argmin(
+                        np.abs(ct[1] - yy))  ## window ct close to box ct
+                    ct_img_x, ct_img_y = int(xx[ct_feat_x]), int(yy[ct_feat_y])
+                    paded_segmnet = np.pad(segment, ((best_window_size // 2, best_window_size // 2),
+                                                     (best_window_size // 2, best_window_size // 2)), 'constant',
+                                           constant_values=0)
+                    window_segment = paded_segmnet[ct_img_y: ct_img_y + best_window_size,
+                                     ct_img_x: ct_img_x + best_window_size]
 
-                feat_offset = det_offset[window_mask][0] - feat_w*feat_h
-                output_offset =ct_feat_y * feat_w + ct_feat_x
-                label_conf[feat_offset + output_offset] = (cls_id+1)
+                    feat_offset = window_offset[window_id] - feat_w * feat_h
+                    output_offset = ct_feat_y * feat_w + ct_feat_x
+                    label_conf[feat_offset + output_offset] = (cls_id + 1)
 
-                xywh[k,0:4] =  bbox[0:4]
-                xywh[k,4:6] =  ct_feat_x,ct_feat_y
-                xywh[k, 6]  =  stride
+                    xywh[k, 0:4] = bbox[0:4]
+                    xywh[k, 4:6] = ct_feat_x, ct_feat_y
+                    xywh[k, 6] = stride
 
-                ind[k] = feat_offset + output_offset
-                reg_mask[k] = 1
+                    ind[k] = feat_offset + output_offset
+                    reg_mask[k] = 1
 
-                window_segment = cv2.resize(window_segment,(best_window//self.base_stride,best_window//self.base_stride))
-                window_index = windows.tolist().index(best_window)
-                seg[window_index][k] = window_segment.astype(np.float32).copy()
+                    window_segment = cv2.resize(window_segment, (best_window_size // self.base_stride,
+                                                                 best_window_size // self.base_stride))
+                    window_index = windows.tolist().index(best_window_size)
+                    seg[window_index][k] = window_segment.astype(np.float32).copy()
 
-                seg_ind[window_index][k] = output_offset
-                seg_mask[window_index][k] = 1
-
-                # cv2.imshow('',window_segment*255)
-                # cv2.waitKey(0)
+                    seg_ind[window_index][k] = output_offset
+                    seg_mask[window_index][k] = 1
 
         ret = {'input':image ,'cls':label_conf,'ind': ind, 'xywh':xywh ,'reg_mask':reg_mask}
         for i in range(len(windows)):
@@ -221,8 +230,8 @@ class COCO(Dataset):
 
 if __name__ == '__main__':
     from config import cfg
-
+    import torch
     data = COCO(cfg,split='val',augment=False)
-    print(len(data))
-    for t in data:
-        pass
+
+    for i,t in enumerate(data):
+        print(i)

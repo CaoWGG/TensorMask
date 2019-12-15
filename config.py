@@ -6,23 +6,23 @@ cfg.backbone = 'resnet50'
 cfg.frezeBN = False
 cfg.frezeLayer = False
 cfg.align_corners = False   ## ref torch.nn.functional.interpolate /// when align_corners==False : [Follow Opencv resize logic]
-cfg.resume = True  ## resume an experiment.Reloaded the optimizer parameter . make sure cfg.weights!="".
 cfg.weights = ''
+cfg.resume = True
 cfg.device = 'cuda'
 
 cfg.cls_weights = 1.
 cfg.xywh_weights = 1.
 cfg.mask_weights = 2.   ## from paper
 
-cfg.data_dir = '/data/yoloCao/DataSet/coco'
+cfg.data_dir = '/data0/cao/DataSet/coco'
 cfg.num_class = 1
 cfg.class_name = 'person'   ## [person , *]
 cfg.input_h = 512   ## 512 % 128 = 0
 cfg.input_w = 640   ## 640 % 128 = 0
-cfg.base_window = 12   ## base_window%2==0 in this impl..|| max window = 12* base_stride * 2^5 / 2  =  768  > 640
-cfg.base_stride = 4    ## feat_2 --> strideHW=4
+cfg.base_window = 8   ## base_window%2==0 in this impl..|| max window = 12* base_stride * 2^5 / 2  =  768  > 640
+cfg.base_stride = 4   ## feat_2 --> strideHW=4
 cfg.k = 5 # 0 1 2 3 4 5
-cfg.max_objs = 45  ## one image objs
+cfg.max_objs = 45
 cfg.jitter = 0.3
 
 
@@ -32,12 +32,12 @@ cfg.lr_step = [64,70]   ## from paper
 cfg.warm_up = 1000
 cfg.batch_size = 6
 
-cfg.gpus_str = '0,1,2'
+cfg.gpus_str = '0,1,2,3'
 
 cfg.save_dir = 'exp'
-cfg.exp_id = 'coco_person'
+cfg.exp_id = 'coco_person_8'
 cfg.print_iter = 1
 cfg.test = False
 cfg.vis_thresh = 0.3
-cfg.show_box =  False
+cfg.show_box =  True
 cfg.demo = ''

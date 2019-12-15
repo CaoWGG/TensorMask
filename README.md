@@ -2,6 +2,14 @@
 ### The code is unofficial version for [TensorMask: A Foundation for Dense Object Segmentation](https://arxiv.org/abs/1903.12174).
 
 * ![image](img/test.png)
+* ![image](img/test_2.png)
+
+input_size = (640x512), no multi-scale training, no multi-scale test 
+
+|class|AP|AP<sub>50</sub>|AP<sub>75</sub>|AP<sub>S</sub>|AP<sub>M</sub>|AP<sub>L</sub>|
+|---|---|---|---|---|---|---|
+|person box|0.481|0.752|0.503|0.256|0.559|0.704|
+|person mask|0.395|0.721|0.392|0.184|0.454|0.614|
 
 ### Reuirments
 1. python==3.7
